@@ -24,6 +24,8 @@ def main():
             lhost = sys.argv[1]
             lport = sys.argv[2]
             listener(lhost, lport, q)
+        except Exception as ex:
+            print("\n[-] Unable to run the handler. Reason: " + str(ex) + "\n")
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
